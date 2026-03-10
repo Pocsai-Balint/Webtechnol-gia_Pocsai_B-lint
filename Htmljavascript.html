@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Számkitaláló játék</title>
+</head>
+<body>
+
+<h2>Számkitaláló játék</h2>
+
+<script>
+    // Véletlen szám generálása 0 és 1 000 000 között
+    const solution = Math.floor(Math.random() * 1000001);
+
+    const maxTries = 25;
+    let step = 0;
+    let guess;
+
+    while (step < maxTries) {
+        guess = parseInt(prompt("Adj meg egy tippet 0 és 1 000 000 között!"));
+
+        // Ellenőrzés, hogy szám-e
+        if (isNaN(guess)) {
+            alert("Ez nem szám! Próbáld újra.");
+            continue;
+        }
+
+        step++;
+
+        if (guess > solution) {
+            alert(step + ". tipp nem talált: A megoldás kisebb.");
+        } 
+        else if (guess < solution) {
+            alert(step + ". tipp nem talált: A megoldás nagyobb.");
+        } 
+        else {
+            alert("Gratulálok, " + step + " lépésből eltaláltad!");
+            break;
+        }
+
+        if (step === maxTries) {
+            alert("Sajnos ez most nem sikerült! A megoldás: " + solution);
+        }
+    }
+</script>
+
+</body>
+</html>
