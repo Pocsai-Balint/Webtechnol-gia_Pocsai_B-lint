@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Teendő lista</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Teendő lista</h2>
+
+    <input type="text" id="todo-input" placeholder="Írj be egy teendőt...">
+    <button id="add-btn" class="btn btn-primary">Hozzáadás</button>
+
+    <ul id="todo-list"></ul>
+</div>
+
+<script>
+    const input = document.getElementById("todo-input");
+    const button = document.getElementById("add-btn");
+    const list = document.getElementById("todo-list");
+
+    button.addEventListener("click", () => {
+        const text = input.value;
+
+        if (text === "") return;
+
+        // új li elem
+        const li = document.createElement("li");
+        li.textContent = text;
+
+        // kattintás → áthúzás
+        li.addEventListener("click", () => {
+            li.classList.toggle("done");
+        });
+
+        list.appendChild(li);
+
+        input.value = "";
+    });
+</script>
+
+</body>
+</html>
