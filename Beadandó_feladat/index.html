@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>BorsodTaxi - Belépés</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card" style="max-width: 400px; margin: 50px auto; text-align: center;">
+            <h2>BorsodTaxi Flottakezelő</h2>
+            <p style="margin-bottom: 20px;">Kérlek add meg a Neptun kódod a belépéshez!</p>
+            <div class="form-group">
+                <input type="text" id="neptun-input" placeholder="Neptun kód (pl. A1B2C3)" maxlength="6">
+            </div>
+            <button id="login-btn" class="btn" style="width: 100%;">Belépés</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if(getNeptun()) window.location.href = "autok.html";
+
+        // Belépés gomb eseménykezelője
+        document.getElementById("login-btn").addEventListener("click", function() {
+            const code = document.getElementById('neptun-input').value.trim();
+            if (!code || code.length < 6) {
+                alert('Érvénytelen Neptun kód!');
+                return;
+            }
+            setNeptun(code);
+            window.location.href = 'autok.html';
+        }); 
+    </script>
+</body>
+</html>

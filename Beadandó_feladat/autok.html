@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>BorsodTaxi - Autók Listája</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Flotta járművei</h2>
+        <div id="cars-list"></div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const neptun = getNeptun();
+        if (!neptun) window.location.href = 'index.html';
+
+        //az oldal autónak leírása, márka, km, stb
+        getCars(neptun).then(cars => {
+            const list = document.getElementById('cars-list');
+            list.innerHTML = ''; 
+
+            cars.forEach(car => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                const title = document.createElement('h3');
+                title.textContent = `${car.brand} ${car.model}`;
+                card.appendChild(title);
+
+                const owner = document.createElement('p');
+                owner.innerHTML = `<strong>Tulajdonos:</strong> ${car.owner}`;
+                card.appendChild(owner);
+
+                const btnContainer = document.createElement('div');
+                btnContainer.style.marginTop = '15px';
+
+                const detailsBtn = document.createElement('a');
+                detailsBtn.href = `auto.html?id=${car.id}`;
+                detailsBtn.className = 'btn';
+                detailsBtn.textContent = 'Részletek';
+                btnContainer.appendChild(detailsBtn);
+
+                card.appendChild(btnContainer);
+                list.appendChild(card);
+            });
+        }).catch(err => {
+            alert('Hiba történt az autók betöltésekor váratlan szerverhiba miatt!');
+        });
+    </script>
+</body>
+</html>

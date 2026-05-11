@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>BorsodTaxi - Új autó</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h2>Új autó hozzáadása</h2>
+            <form id="car-form">
+                <div class="form-group">
+                    <label>Márka</label>
+                    <select id="brand"></select>
+                </div>
+                <div class="form-group">
+                    <label>Modell</label>
+                    <input type="text" id="model" required>
+                </div>
+                <div class="form-group">
+                    <label>Tulajdonos</label>
+                    <input type="text" id="owner" required>
+                </div>
+                <div class="form-group">
+                    <label>Üzembe helyezés</label>
+                    <input type="date" id="dayOfCommission" required>
+                </div>
+                <div class="form-group">
+                    <label>Elektromos?</label>
+                    <input type="checkbox" id="electric">
+                </div>
+                <div class="form-group">
+                    <label>Fogyasztás (L/100km)</label>
+                    <input type="number" id="fuelUse" step="0.1" min="0">
+                </div>
+                <button type="submit" class="btn">Mentés</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const neptun = getNeptun();
+        if (!neptun) window.location.href = 'index.html';
+
+        fillBrandSelect('brand');
+
+        // Az üzembe helyezés dátumának maximuma legyen a mai nap
+        const ma = new Date().toISOString().split('T')[0];
+        document.getElementById('dayOfCommission').max = ma;
+
+        // Ha elektromos autó, tiltsuk a fogyasztás megadását
+        document.getElementById('electric').addEventListener('change', function() {
+            document.getElementById('fuelUse').disabled = this.checked;
+            if (this.checked) document.getElementById('fuelUse').value = '';
+        });
+
+        // Form kezelése
+        document.getElementById('car-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const owner = document.getElementById('owner').value.trim();
+            const electric = document.getElementById('electric').checked;
+            const fuelUse = parseFloat(document.getElementById('fuelUse').value);
+            const valasztottDatum = document.getElementById('dayOfCommission').value;
+            
+            if (valasztottDatum > ma) {
+                alert('Az üzembe helyezés dátuma nem lehet jövőbeli!');
+                return;
+            }
+
+            if (!owner.includes(' ')) {
+                alert('A tulajdonos névnek legalább egy szóközt kell tartalmaznia!');
+                return;
+            }
+
+            if (!electric && (isNaN(fuelUse) || fuelUse <= 0)) {
+                alert('Nem elektromos autónál a fogyasztásnak nagyobbnak kell lennie 0-nál!');
+                return;
+            }
+
+            // Adatok összeállítása
+            const carData = {
+                brand: document.getElementById('brand').value,
+                model: document.getElementById('model').value.trim(),
+                owner: owner,
+                dayOfCommission: valasztottDatum,
+                electric: electric,
+                fuelUse: electric ? 0 : fuelUse
+            };
+
+            createCar(neptun, carData).then(() => {
+                alert('Autó sikeresen létrehozva!');
+                window.location.href = 'autok.html';
+            }).catch(err => alert('Hiba történt a mentéskor!'));
+        });
+    </script>
+</body>
+</html>

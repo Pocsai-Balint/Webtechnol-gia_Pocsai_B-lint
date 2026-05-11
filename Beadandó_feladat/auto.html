@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>BorsodTaxi - Autó Részletei</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div id="car-detail" class="card">
+            <h2 id="car-title">Betöltés...</h2>
+            <div id="car-info"></div>
+            <div style="margin-top: 20px;">
+                <a id="edit-link" href="#" class="btn">Szerkesztés</a>
+                <button id="delete-btn" class="btn btn-danger">Törlés</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const neptun = getNeptun();
+        if (!neptun) window.location.href = 'index.html';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+
+        if (!id) window.location.href = 'autok.html';
+
+        // Betöltjük az autó adatait az oldalra
+        getCarDetails(neptun, id).then(car => {
+            document.getElementById('car-title').textContent = `${car.brand} ${car.model} (#${car.id})`;
+            
+            document.getElementById('car-info').innerHTML = `
+                <p><strong>Tulajdonos:</strong> ${car.owner}</p>
+                <p><strong>Üzembe helyezés:</strong> ${car.dayOfCommission}</p>
+                <p><strong>Elektromos:</strong> ${car.electric ? 'Igen' : 'Nem'}</p>
+                <p><strong>Fogyasztás:</strong> ${car.electric ? '0' : car.fuelUse} L/100km</p>
+            `;
+
+            // Szerkesztés és törlés gombjai
+            document.getElementById('edit-link').href = `szerk-auto.html?id=${car.id}`;
+            
+            document.getElementById('delete-btn').addEventListener('click', () => {
+                if(confirm('Biztosan törölni szeretnéd ezt az autót?')) {
+                    deleteCar(neptun, id).then(() => {
+                        alert('Sikeres törlés!');
+                        window.location.href = 'autok.html';
+                    }).catch(err => alert('Hiba a törlés során!'));
+                }
+            });
+        }).catch(err => {
+            alert('Hiba történt az adatok betöltésekor!');
+            window.location.href = 'autok.html';
+        });
+    </script>
+</body>
+</html>

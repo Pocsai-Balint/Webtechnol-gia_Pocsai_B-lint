@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>BorsodTaxi - Szerkesztés</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h2>Autó szerkesztése</h2>
+            <form id="car-form">
+                <div class="form-group">
+                    <label>Márka</label>
+                    <select id="brand"></select>
+                </div>
+                <div class="form-group">
+                    <label>Modell</label>
+                    <input type="text" id="model" required>
+                </div>
+                <div class="form-group">
+                    <label>Tulajdonos</label>
+                    <input type="text" id="owner" required>
+                </div>
+                <div class="form-group">
+                    <label>Üzembe helyezés</label>
+                    <input type="date" id="dayOfCommission" required>
+                </div>
+                <div class="form-group">
+                    <label>Elektromos?</label>
+                    <input type="checkbox" id="electric">
+                </div>
+                <div class="form-group">
+                    <label>Fogyasztás (L/100km)</label>
+                    <input type="number" id="fuelUse" step="0.1" min="0">
+                </div>
+                <a id="cancel-btn" href="autok.html" class="btn btn-danger">Mégse</a>
+                <button type="submit" class="btn">Módosítás</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const neptun = getNeptun();
+        if (!neptun) window.location.href = 'index.html';
+
+        // URL paraméterből kinyerjük az autó ID-ját
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        if (!id) window.location.href = 'autok.html';
+
+        // A "Mégse" gomb
+        document.getElementById('cancel-btn').href = `auto.html?id=${id}`;
+        fillBrandSelect('brand');
+
+        // Betöltjük az autó adatait a formba
+        getCarDetails(neptun, id).then(car => {
+            document.getElementById('brand').value = car.brand;
+            document.getElementById('model').value = car.model;
+            document.getElementById('owner').value = car.owner;
+            document.getElementById('dayOfCommission').value = car.dayOfCommission;
+            document.getElementById('electric').checked = car.electric;
+            document.getElementById('fuelUse').value = car.electric ? '' : car.fuelUse;
+            document.getElementById('fuelUse').disabled = car.electric;
+        }).catch(err => {
+            alert('Hiba az adatok betöltésekor!');
+            window.location.href = 'autok.html';
+        });
+
+        //elektromos autó fogy. tiltás
+        document.getElementById('electric').addEventListener('change', function() {
+            document.getElementById('fuelUse').disabled = this.checked;
+            if (this.checked) document.getElementById('fuelUse').value = '';
+        });
+
+        document.getElementById('car-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const owner = document.getElementById('owner').value.trim();
+            const electric = document.getElementById('electric').checked;
+            const fuelUse = parseFloat(document.getElementById('fuelUse').value);
+
+            if (!owner.includes(' ')) {
+                alert('A tulajdonos névnek legalább egy szóközt kell tartalmaznia!');
+                return;
+            }
+
+            if (!electric && (isNaN(fuelUse) || fuelUse <= 0)) {
+                alert('Nem elektromos autónál a fogyasztásnak nagyobbnak kell lennie, mint 0!');
+                return;
+            }
+
+            const carData = {
+                id: parseInt(id),
+                brand: document.getElementById('brand').value,
+                model: document.getElementById('model').value.trim(),
+                owner: owner,
+                dayOfCommission: document.getElementById('dayOfCommission').value,
+                electric: electric,
+                fuelUse: electric ? 0 : fuelUse
+            };
+
+            updateCar(neptun, carData).then(() => {
+                alert('Autó sikeresen módosítva!');
+                window.location.href = `auto.html?id=${id}`;
+            }).catch(err => alert('Hiba történt a mentés során!'));
+        });
+    </script>
+</body>
+</html>
