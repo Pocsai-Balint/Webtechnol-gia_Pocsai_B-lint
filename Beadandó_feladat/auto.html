@@ -2,7 +2,7 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>BorsodTaxi - Autó Részletei</title>
+    <title>MiskolcTaxi - Autó Részletei</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,6 +22,7 @@
         const neptun = getNeptun();
         if (!neptun) window.location.href = 'index.html';
 
+        
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
 
