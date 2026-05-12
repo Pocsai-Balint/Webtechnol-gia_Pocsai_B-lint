@@ -2,7 +2,7 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>BorsodTaxi - Új autó</title>
+    <title>MiskolcTaxi - Új autó</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -93,7 +93,9 @@
             createCar(neptun, carData).then(() => {
                 alert('Autó sikeresen létrehozva!');
                 window.location.href = 'autok.html';
-            }).catch(err => alert('Hiba történt a mentéskor!'));
+            }).catch(err => {
+                alert('Hiba a mentés során: ' + err.message);
+            });
         });
     </script>
 </body>
