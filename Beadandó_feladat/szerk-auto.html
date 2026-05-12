@@ -45,16 +45,16 @@
         const neptun = getNeptun();
         if (!neptun) window.location.href = 'index.html';
 
-        // URL paraméterből kinyerjük az autó ID-ját
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
         if (!id) window.location.href = 'autok.html';
 
-        // A "Mégse" gomb
         document.getElementById('cancel-btn').href = `auto.html?id=${id}`;
         fillBrandSelect('brand');
 
-        // Betöltjük az autó adatait a formba
+        const ma = new Date().toISOString().split('T')[0];
+        document.getElementById('dayOfCommission').max = ma;
+
         getCarDetails(neptun, id).then(car => {
             document.getElementById('brand').value = car.brand;
             document.getElementById('model').value = car.model;
@@ -68,7 +68,6 @@
             window.location.href = 'autok.html';
         });
 
-        //elektromos autó fogy. tiltás
         document.getElementById('electric').addEventListener('change', function() {
             document.getElementById('fuelUse').disabled = this.checked;
             if (this.checked) document.getElementById('fuelUse').value = '';
@@ -80,6 +79,12 @@
             const owner = document.getElementById('owner').value.trim();
             const electric = document.getElementById('electric').checked;
             const fuelUse = parseFloat(document.getElementById('fuelUse').value);
+            const valasztottDatum = document.getElementById('dayOfCommission').value;
+
+            if (valasztottDatum > ma) {
+                alert('Az üzembe helyezés dátuma nem lehet jövőbeli!');
+                return;
+            }
 
             if (!owner.includes(' ')) {
                 alert('A tulajdonos névnek legalább egy szóközt kell tartalmaznia!');
@@ -87,7 +92,7 @@
             }
 
             if (!electric && (isNaN(fuelUse) || fuelUse <= 0)) {
-                alert('Nem elektromos autónál a fogyasztásnak nagyobbnak kell lennie, mint 0!');
+                alert('Nem elektromos autónál a fogyasztásnak nagyobbnak kell lennie 0-nál!');
                 return;
             }
 
@@ -96,7 +101,7 @@
                 brand: document.getElementById('brand').value,
                 model: document.getElementById('model').value.trim(),
                 owner: owner,
-                dayOfCommission: document.getElementById('dayOfCommission').value,
+                dayOfCommission: valasztottDatum,
                 electric: electric,
                 fuelUse: electric ? 0 : fuelUse
             };
@@ -104,7 +109,7 @@
             updateCar(neptun, carData).then(() => {
                 alert('Autó sikeresen módosítva!');
                 window.location.href = `auto.html?id=${id}`;
-            }).catch(err => alert('Hiba történt a mentés során!'));
+            }).catch(err => alert('Hiba a módosítás során: ' + err.message));
         });
     </script>
 </body>
